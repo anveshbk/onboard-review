@@ -38,7 +38,7 @@ const App = () => (
                 path="/submissions/:id" 
                 element={
                   <ProtectedRoute>
-                    <Dashboard />
+                    <SubmissionDetail />
                   </ProtectedRoute>
                 } 
               />

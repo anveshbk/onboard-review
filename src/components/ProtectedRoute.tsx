@@ -13,7 +13,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   
   // Add debug logging
   useEffect(() => {
-    console.log("ProtectedRoute - Auth state:", { user, isLoading, path: location.pathname });
+    console.log("ProtectedRoute - Auth state:", { 
+      user, 
+      isLoading, 
+      path: location.pathname, 
+      hasLocalStorageUser: !!localStorage.getItem("user") 
+    });
   }, [user, isLoading, location.pathname]);
 
   if (isLoading) {
