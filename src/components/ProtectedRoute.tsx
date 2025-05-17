@@ -11,13 +11,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user, isLoading } = useAuth();
   const location = useLocation();
   
-  // Add debug logging
+  // Add detailed debug logging
   useEffect(() => {
     console.log("ProtectedRoute - Auth state:", { 
       user, 
       isLoading, 
       path: location.pathname, 
-      hasLocalStorageUser: !!localStorage.getItem("user") 
+      hasLocalStorageUser: !!localStorage.getItem("user"),
+      sessionExpiry: localStorage.getItem("sessionExpiry")
     });
   }, [user, isLoading, location.pathname]);
 
@@ -31,7 +32,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   if (!user) {
     console.log("No user found, redirecting to login");
-    // Redirect to the login page but save the current location they were trying to access
+    // Save current location to redirect back after login
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

@@ -45,41 +45,75 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, [user, isLoading, location.pathname]);
 
+  // Set up activity tracking to extend session
   useEffect(() => {
-    // Check for user in localStorage on mount
-    const storedUser = localStorage.getItem("user");
-    const sessionExpiry = localStorage.getItem("sessionExpiry");
+    const extendSession = () => {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser && user) {
+        // Reset session timer on activity
+        const newExpiryTime = Date.now() + 30 * 60 * 1000; // 30 minutes
+        localStorage.setItem("sessionExpiry", newExpiryTime.toString());
+        console.log("Session extended to:", new Date(newExpiryTime).toLocaleTimeString());
+      }
+    };
+
+    // Add event listeners to track user activity
+    window.addEventListener("click", extendSession);
+    window.addEventListener("keypress", extendSession);
+    window.addEventListener("scroll", extendSession);
     
-    console.log("Initial auth check:", { storedUser: !!storedUser, sessionExpiry });
-    
-    if (storedUser && sessionExpiry) {
-      try {
-        const expiryTime = Number(sessionExpiry);
-        // Check if the session is still valid
-        if (expiryTime > Date.now()) {
-          const parsedUser = JSON.parse(storedUser);
-          console.log("Session is valid, setting user:", parsedUser);
-          setUser(parsedUser);
-          
-          // Refresh the session timer when the user is active
-          const newExpiryTime = Date.now() + 30 * 60 * 1000; // 30 minutes
-          localStorage.setItem("sessionExpiry", newExpiryTime.toString());
-        } else {
-          // Session expired
-          console.log("Session expired, logging out");
+    return () => {
+      window.removeEventListener("click", extendSession);
+      window.removeEventListener("keypress", extendSession);
+      window.removeEventListener("scroll", extendSession);
+    };
+  }, [user]);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      // Check for user in localStorage on mount
+      const storedUser = localStorage.getItem("user");
+      const sessionExpiry = localStorage.getItem("sessionExpiry");
+      
+      console.log("Initial auth check:", { 
+        storedUser: !!storedUser, 
+        sessionExpiry,
+        currentTime: Date.now(),
+        expiryTime: sessionExpiry ? Number(sessionExpiry) : null,
+        isValid: sessionExpiry ? Number(sessionExpiry) > Date.now() : false
+      });
+      
+      if (storedUser && sessionExpiry) {
+        try {
+          const expiryTime = Number(sessionExpiry);
+          // Check if the session is still valid
+          if (expiryTime > Date.now()) {
+            const parsedUser = JSON.parse(storedUser);
+            console.log("Session is valid, setting user:", parsedUser);
+            setUser(parsedUser);
+            
+            // Refresh the session timer when the user is active
+            const newExpiryTime = Date.now() + 30 * 60 * 1000; // 30 minutes
+            localStorage.setItem("sessionExpiry", newExpiryTime.toString());
+          } else {
+            // Session expired
+            console.log("Session expired, clearing stored data");
+            localStorage.removeItem("user");
+            localStorage.removeItem("sessionExpiry");
+            // Don't navigate here, as it causes issues
+          }
+        } catch (error) {
+          console.error("Failed to parse stored user", error);
           localStorage.removeItem("user");
           localStorage.removeItem("sessionExpiry");
-          // Don't navigate here, as it causes redirect issues
         }
-      } catch (error) {
-        console.error("Failed to parse stored user", error);
-        localStorage.removeItem("user");
-        localStorage.removeItem("sessionExpiry");
+      } else {
+        console.log("No stored user found");
       }
-    } else {
-      console.log("No stored user found");
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+    
+    checkAuth();
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
