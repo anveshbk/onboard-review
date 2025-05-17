@@ -45,30 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, [user, isLoading, location.pathname]);
 
-  // Set up activity tracking to extend session
-  useEffect(() => {
-    const extendSession = () => {
-      const storedUser = localStorage.getItem("user");
-      if (storedUser && user) {
-        // Reset session timer on activity
-        const newExpiryTime = Date.now() + 30 * 60 * 1000; // 30 minutes
-        localStorage.setItem("sessionExpiry", newExpiryTime.toString());
-        console.log("Session extended to:", new Date(newExpiryTime).toLocaleTimeString());
-      }
-    };
-
-    // Add event listeners to track user activity
-    window.addEventListener("click", extendSession);
-    window.addEventListener("keypress", extendSession);
-    window.addEventListener("scroll", extendSession);
-    
-    return () => {
-      window.removeEventListener("click", extendSession);
-      window.removeEventListener("keypress", extendSession);
-      window.removeEventListener("scroll", extendSession);
-    };
-  }, [user]);
-
+  // Check authentication on component mount
   useEffect(() => {
     const checkAuth = () => {
       // Check for user in localStorage on mount
@@ -92,7 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.log("Session is valid, setting user:", parsedUser);
             setUser(parsedUser);
             
-            // Refresh the session timer when the user is active
+            // Refresh the session timer 
             const newExpiryTime = Date.now() + 30 * 60 * 1000; // 30 minutes
             localStorage.setItem("sessionExpiry", newExpiryTime.toString());
           } else {
@@ -100,21 +77,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.log("Session expired, clearing stored data");
             localStorage.removeItem("user");
             localStorage.removeItem("sessionExpiry");
-            // Don't navigate here, as it causes issues
+            setUser(null);
           }
         } catch (error) {
           console.error("Failed to parse stored user", error);
           localStorage.removeItem("user");
           localStorage.removeItem("sessionExpiry");
+          setUser(null);
         }
       } else {
         console.log("No stored user found");
+        setUser(null);
       }
       setIsLoading(false);
     };
     
     checkAuth();
   }, []);
+
+  // Set up activity tracking to extend session
+  useEffect(() => {
+    const extendSession = () => {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser && user) {
+        // Reset session timer on activity
+        const newExpiryTime = Date.now() + 30 * 60 * 1000; // 30 minutes
+        localStorage.setItem("sessionExpiry", newExpiryTime.toString());
+        console.log("Session extended to:", new Date(newExpiryTime).toLocaleTimeString());
+      }
+    };
+
+    // Add event listeners to track user activity
+    window.addEventListener("click", extendSession);
+    window.addEventListener("keypress", extendSession);
+    window.addEventListener("scroll", extendSession);
+    
+    return () => {
+      window.removeEventListener("click", extendSession);
+      window.removeEventListener("keypress", extendSession);
+      window.removeEventListener("scroll", extendSession);
+    };
+  }, [user]);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     // Simulate API call

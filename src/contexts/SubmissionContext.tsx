@@ -29,6 +29,7 @@ export const SubmissionProvider: React.FC<{ children: React.ReactNode }> = ({
     // Simulate fetching data from API
     const fetchSubmissions = async () => {
       try {
+        console.log("Fetching submissions data...");
         // In a real app, this would be an API call
         await new Promise(resolve => setTimeout(resolve, 1000));
         setSubmissions(mockSubmissions);
@@ -37,11 +38,18 @@ export const SubmissionProvider: React.FC<{ children: React.ReactNode }> = ({
         toast.error("Failed to load submissions");
       } finally {
         setIsLoading(false);
+        console.log("Submissions data loaded");
       }
     };
 
-    fetchSubmissions();
-  }, []);
+    if (user) {
+      fetchSubmissions();
+    } else {
+      // If no user, don't try to fetch data
+      setSubmissions([]);
+      setIsLoading(false);
+    }
+  }, [user]);
 
   const setSubmissionStatus = (
     id: string,
