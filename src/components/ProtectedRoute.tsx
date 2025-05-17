@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -10,6 +10,11 @@ type ProtectedRouteProps = {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user, isLoading } = useAuth();
   const location = useLocation();
+  
+  // Add debug logging
+  useEffect(() => {
+    console.log("ProtectedRoute - Auth state:", { user, isLoading, path: location.pathname });
+  }, [user, isLoading, location.pathname]);
 
   if (isLoading) {
     return (
@@ -20,10 +25,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!user) {
+    console.log("No user found, redirecting to login");
     // Redirect to the login page but save the current location they were trying to access
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  console.log("User authenticated, rendering protected content");
   return <>{children}</>;
 };
 

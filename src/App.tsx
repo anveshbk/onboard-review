@@ -12,6 +12,7 @@ import Dashboard from "@/pages/Dashboard";
 import SubmissionDetail from "@/pages/SubmissionDetail";
 import NotFound from "@/pages/NotFound";
 
+// Create a new query client instance
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -37,7 +38,7 @@ const App = () => (
                 path="/submissions/:id" 
                 element={
                   <ProtectedRoute>
-                    <SubmissionDetail />
+                    <Dashboard />
                   </ProtectedRoute>
                 } 
               />

@@ -41,13 +41,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     if (storedUser && sessionExpiry) {
       try {
+        const expiryTime = Number(sessionExpiry);
         // Check if the session is still valid
-        if (Number(sessionExpiry) > Date.now()) {
+        if (expiryTime > Date.now()) {
           setUser(JSON.parse(storedUser));
+          
+          // Optional: Refresh the session timer when the user is active
+          const newExpiryTime = Date.now() + 30 * 60 * 1000; // 30 minutes
+          localStorage.setItem("sessionExpiry", newExpiryTime.toString());
         } else {
           // Session expired
+          console.log("Session expired, logging out");
           localStorage.removeItem("user");
           localStorage.removeItem("sessionExpiry");
+          // Don't navigate here, as it causes redirect issues
         }
       } catch (error) {
         console.error("Failed to parse stored user", error);
