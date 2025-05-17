@@ -38,18 +38,24 @@ const ActionButtons = ({ submissionStatus, onApprove, onReject }: ActionButtonsP
     setRejectDialogOpen(false);
   };
 
+  // Check if the submission is already approved or rejected
+  const isReviewed = submissionStatus === "approved" || submissionStatus === "rejected";
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Review Actions</CardTitle>
         <CardDescription>
-          Approve or reject this submission
+          {isReviewed 
+            ? `This submission has already been ${submissionStatus}`
+            : "Approve or reject this submission"
+          }
         </CardDescription>
       </CardHeader>
       <CardFooter className="flex justify-between">
         <AlertDialog open={approveDialogOpen} onOpenChange={setApproveDialogOpen}>
           <AlertDialogTrigger asChild>
-            <Button disabled={submissionStatus !== undefined}>
+            <Button disabled={isReviewed}>
               <Check className="mr-2 h-4 w-4" /> Approve
             </Button>
           </AlertDialogTrigger>
@@ -73,7 +79,7 @@ const ActionButtons = ({ submissionStatus, onApprove, onReject }: ActionButtonsP
           <AlertDialogTrigger asChild>
             <Button
               variant="destructive"
-              disabled={submissionStatus !== undefined}
+              disabled={isReviewed}
             >
               <X className="mr-2 h-4 w-4" /> Reject
             </Button>
