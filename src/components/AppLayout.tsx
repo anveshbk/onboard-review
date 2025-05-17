@@ -19,7 +19,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         <div className="flex h-16 items-center px-4 md:px-6">
           <div className="flex items-center gap-2">
             <ClipboardList className="h-6 w-6 text-primary" />
-            <span className="text-lg font-semibold">Compliance Dashboard</span>
+            <span className="text-lg font-semibold">Client Onboarding Dashboard</span>
           </div>
           <div className="ml-auto flex items-center gap-2">
             {user && (

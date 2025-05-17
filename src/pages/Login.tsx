@@ -30,7 +30,7 @@ const Login = () => {
           <div className="flex justify-center mb-2">
             <ClipboardList className="h-10 w-10 text-primary" />
           </div>
-          <CardTitle className="text-2xl">Compliance Dashboard</CardTitle>
+          <CardTitle className="text-2xl">Client Onboarding Dashboard</CardTitle>
           <CardDescription>
             Enter your credentials to access the dashboard
           </CardDescription>
