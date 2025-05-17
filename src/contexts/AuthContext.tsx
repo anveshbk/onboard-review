@@ -37,12 +37,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     // Check for user in localStorage on mount
     const storedUser = localStorage.getItem("user");
-    if (storedUser) {
+    const sessionExpiry = localStorage.getItem("sessionExpiry");
+    
+    if (storedUser && sessionExpiry) {
       try {
-        setUser(JSON.parse(storedUser));
+        // Check if the session is still valid
+        if (Number(sessionExpiry) > Date.now()) {
+          setUser(JSON.parse(storedUser));
+        } else {
+          // Session expired
+          localStorage.removeItem("user");
+          localStorage.removeItem("sessionExpiry");
+        }
       } catch (error) {
         console.error("Failed to parse stored user", error);
         localStorage.removeItem("user");
+        localStorage.removeItem("sessionExpiry");
       }
     }
     setIsLoading(false);
@@ -69,6 +79,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser(userWithoutPassword);
           localStorage.setItem("user", JSON.stringify(userWithoutPassword));
           
+          // Set session expiry time (30 minutes from now)
+          const expiryTime = Date.now() + 30 * 60 * 1000; // 30 minutes in milliseconds
+          localStorage.setItem("sessionExpiry", expiryTime.toString());
+          
           // Redirect to the page they tried to visit or to dashboard
           const origin = location.state?.from?.pathname || "/dashboard";
           navigate(origin);
@@ -86,6 +100,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
+    localStorage.removeItem("sessionExpiry");
     navigate("/login");
     toast.info("You have been logged out");
   };

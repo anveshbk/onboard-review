@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { mockSubmissions, Submission } from "@/utils/mockData";
 import { toast } from "sonner";
+import { useAuth } from "./AuthContext";
 
 type SubmissionContextType = {
   submissions: Submission[];
@@ -22,6 +23,7 @@ export const SubmissionProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     // Simulate fetching data from API
@@ -52,7 +54,17 @@ export const SubmissionProvider: React.FC<{ children: React.ReactNode }> = ({
           return {
             ...submission,
             status,
-            reviewComments: comments || submission.reviewComments
+            reviewComments: comments || submission.reviewComments,
+            // Add approval metadata if approved
+            ...(status === "approved" && user ? {
+              approvedBy: user.name,
+              approvalTimestamp: new Date().toISOString()
+            } : {}),
+            // Add rejection metadata if rejected
+            ...(status === "rejected" && user ? {
+              rejectedBy: user.name,
+              rejectionTimestamp: new Date().toISOString()
+            } : {})
           };
         }
         return submission;
@@ -64,6 +76,10 @@ export const SubmissionProvider: React.FC<{ children: React.ReactNode }> = ({
     } else {
       toast.success("Submission rejected successfully");
     }
+
+    // Store updated submissions in localStorage for persistence
+    // In a real app, you would save this to a database
+    localStorage.setItem("submissions", JSON.stringify(submissions));
   };
 
   const getSubmission = (id: string) => {
@@ -83,6 +99,9 @@ export const SubmissionProvider: React.FC<{ children: React.ReactNode }> = ({
         return submission;
       })
     );
+
+    // Store updated submissions in localStorage for persistence
+    localStorage.setItem("submissions", JSON.stringify(submissions));
   };
 
   return (

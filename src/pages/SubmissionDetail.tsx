@@ -61,8 +61,8 @@ const SubmissionDetail = () => {
     );
   }
 
-  const isUat = submission.environment === "UAT";
-  const isProd = submission.environment === "PROD";
+  const isUat = submission?.environment === "UAT";
+  const isProd = submission?.environment === "PROD";
   
   const handleAddReviewNote = (label: string, value: string | number | boolean) => {
     const noteText = `${label}: ${value.toString()}`;
@@ -275,28 +275,46 @@ const SubmissionDetail = () => {
           </Button>
           <div>
             <h1 className="text-2xl font-bold md:text-3xl">
-              {submission.fiuRegisteredName}
+              {submission?.fiuRegisteredName}
             </h1>
             <div className="mt-1 flex flex-wrap items-center gap-2">
-              <Badge variant="outline">ID: {submission.id}</Badge>
+              <Badge variant="outline">ID: {submission?.id}</Badge>
               <Badge
-                variant={submission.environment === "PROD" ? "destructive" : "outline"}
+                variant={submission?.environment === "PROD" ? "destructive" : "outline"}
               >
-                {submission.environment}
+                {submission?.environment}
               </Badge>
               <Badge className={
-                submission.status === "approved"
+                submission?.status === "approved"
                   ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                  : submission.status === "rejected"
+                  : submission?.status === "rejected"
                   ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
                   : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
               }>
-                {submission.status || "Pending"}
+                {submission?.status || "Pending"}
               </Badge>
               <span className="text-sm text-muted-foreground">
-                Submitted: {format(new Date(submission.submissionTimestamp), "PPP")}
+                Submitted: {submission?.submissionTimestamp ? format(new Date(submission.submissionTimestamp), "PPP") : ''}
               </span>
             </div>
+            
+            {/* Display approval information */}
+            {submission?.status === "approved" && submission.approvedBy && (
+              <div className="mt-2 text-sm text-muted-foreground">
+                <span className="font-medium text-green-600">
+                  Approved by {submission.approvedBy} on {format(new Date(submission.approvalTimestamp || ''), "PPP p")}
+                </span>
+              </div>
+            )}
+            
+            {/* Display rejection information */}
+            {submission?.status === "rejected" && submission.rejectedBy && (
+              <div className="mt-2 text-sm text-muted-foreground">
+                <span className="font-medium text-red-600">
+                  Rejected by {submission.rejectedBy} on {format(new Date(submission.rejectionTimestamp || ''), "PPP p")}
+                </span>
+              </div>
+            )}
           </div>
         </div>
         
