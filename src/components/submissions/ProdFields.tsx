@@ -84,10 +84,15 @@ const ProdFields = ({ prod, onAddNote }: ProdFieldsProps) => {
         ))}
       </div>
 
-      <SubmissionField label="Figma URL" value={prod.figmaUrl} onAddNote={onAddNote} />
-      <SubmissionField label="Data Passed To Onemoney" value={prod.dataPassedToOnemoney} onAddNote={onAddNote} />
-      <SubmissionField label="Data Shared From Onemoney" value={prod.dataSharedFromOnemoney} onAddNote={onAddNote} />
-      <SubmissionField label="Onemoney API Referenced" value={prod.onemoneyApiReferenced} onAddNote={onAddNote} />
+      <div className="my-6">
+        <h4 className="mb-2 font-medium">Co-creation Details</h4>
+        <div className="grid grid-cols-1 gap-x-4 md:grid-cols-2">
+          <SubmissionField label="Figma URL" value={prod.figmaUrl} onAddNote={onAddNote} />
+          <SubmissionField label="Data Passed To Onemoney" value={prod.dataPassedToOnemoney} onAddNote={onAddNote} />
+          <SubmissionField label="Data Shared From Onemoney" value={prod.dataSharedFromOnemoney} onAddNote={onAddNote} />
+          <SubmissionField label="Onemoney API Referenced" value={prod.onemoneyApiReferenced} onAddNote={onAddNote} />
+        </div>
+      </div>
     </>
   );
 };
