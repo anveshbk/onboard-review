@@ -54,6 +54,7 @@ const SubmissionDetail = () => {
               submissionStatus={submission.status}
               onApprove={handleApprove}
               onReject={handleReject}
+              submission={submission}
             />
           </div>
         </div>

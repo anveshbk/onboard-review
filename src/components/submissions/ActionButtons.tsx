@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, X } from "lucide-react";
+import { Check, X, Download } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import {
   AlertDialog,
@@ -20,9 +20,10 @@ interface ActionButtonsProps {
   submissionStatus: string | undefined;
   onApprove: () => void;
   onReject: (comment: string) => void;
+  submission: any; // Add submission prop to access the submission data
 }
 
-const ActionButtons = ({ submissionStatus, onApprove, onReject }: ActionButtonsProps) => {
+const ActionButtons = ({ submissionStatus, onApprove, onReject, submission }: ActionButtonsProps) => {
   const [rejectComment, setRejectComment] = useState("");
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
@@ -30,12 +31,59 @@ const ActionButtons = ({ submissionStatus, onApprove, onReject }: ActionButtonsP
   const handleApprove = () => {
     onApprove();
     setApproveDialogOpen(false);
+    
+    // Create the JSON data for approval
+    const approvalData = {
+      fiuCrIdProd: submission.fiuCrIdProd || submission.fiuCrId,
+      fiuSpocEmail: submission.tspSpocEmail || (submission.fiuSpoc ? submission.fiuSpoc.email : ''),
+      fiuLogo: submission.fiuLogo || '',
+      integrationDetails: {
+        integrationMode: submission.integrationMode || '',
+        integrationType: submission.integrationType || {},
+        whitelistedUrls: submission.whitelistedUrls || [],
+        consentRequired: submission.consentRequired || false,
+        accountTypeFilter: submission.accountTypeFilter || '',
+        fipSelectionInHostApp: submission.fipSelectionInHostApp || false,
+        maxFipLimit: submission.maxFipLimit || 0,
+        singleFipMultiFip: submission.singleFipMultiFip || '',
+        accountSelectionType: submission.accountSelectionType || '',
+        targetedAutoDiscovery: submission.targetedAutoDiscovery || false,
+      }
+    };
+    
+    // Download the JSON file
+    downloadJson(approvalData, `approval-${submission.id}-${new Date().toISOString()}.json`);
   };
 
   const handleReject = () => {
     if (rejectComment.trim() === "") return;
     onReject(rejectComment);
     setRejectDialogOpen(false);
+    
+    // Create the JSON data for rejection
+    const rejectionData = {
+      fiuCrId: submission.fiuCrId || '',
+      reviewNotes: submission.reviewNotes || [],
+      rejectionComment: rejectComment,
+      rejectedBy: submission.rejectedBy || '',
+      rejectionTimestamp: new Date().toISOString()
+    };
+    
+    // Download the JSON file
+    downloadJson(rejectionData, `rejection-${submission.id}-${new Date().toISOString()}.json`);
+  };
+
+  // Helper function to download JSON
+  const downloadJson = (data: any, filename: string) => {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   // Check if the submission is already approved or rejected
