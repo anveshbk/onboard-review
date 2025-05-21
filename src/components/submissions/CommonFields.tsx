@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface CommonFieldsProps {
   submission: Submission;
-  onAddNote: (label: string, value: string | number | boolean) => void;
+  onAddNote: (label: string, value: string | number | boolean, comment?: string) => void;
 }
 
 const CommonFields = ({ submission, onAddNote }: CommonFieldsProps) => {

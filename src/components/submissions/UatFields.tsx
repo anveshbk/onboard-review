@@ -4,7 +4,7 @@ import SubmissionField from "./SubmissionField";
 
 interface UatFieldsProps {
   uat: any;
-  onAddNote: (label: string, value: string | number | boolean) => void;
+  onAddNote: (label: string, value: string | number | boolean, comment?: string) => void;
 }
 
 const UatFields = ({ uat, onAddNote }: UatFieldsProps) => {

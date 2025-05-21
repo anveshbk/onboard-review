@@ -22,9 +22,9 @@ const SubmissionDetail = () => {
     );
   }
 
-  const handleAddReviewNote = (label: string, value: string | number | boolean) => {
+  const handleAddReviewNote = (label: string, value: string | number | boolean, comment?: string) => {
     const noteText = `${label}: ${value.toString()}`;
-    addReviewNote(submission.id, noteText);
+    addReviewNote(submission.id, noteText, comment);
   };
   
   const handleApprove = () => {

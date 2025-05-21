@@ -12,7 +12,7 @@ type SubmissionContextType = {
     comments?: string
   ) => void;
   getSubmission: (id: string) => Submission | undefined;
-  addReviewNote: (id: string, note: string) => void;
+  addReviewNote: (id: string, note: string, comment?: string) => void;
   isLoading: boolean;
 };
 
@@ -94,14 +94,15 @@ export const SubmissionProvider: React.FC<{ children: React.ReactNode }> = ({
     return submissions.find(submission => submission.id === id);
   };
 
-  const addReviewNote = (id: string, note: string) => {
+  const addReviewNote = (id: string, note: string, comment?: string) => {
     setSubmissions(prev =>
       prev.map(submission => {
         if (submission.id === id) {
           const reviewNotes = submission.reviewNotes || [];
+          const noteWithComment = comment ? `${note} - Comment: ${comment}` : note;
           return {
             ...submission,
-            reviewNotes: [...reviewNotes, note]
+            reviewNotes: [...reviewNotes, noteWithComment]
           };
         }
         return submission;
@@ -110,6 +111,8 @@ export const SubmissionProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // Store updated submissions in localStorage for persistence
     localStorage.setItem("submissions", JSON.stringify(submissions));
+    
+    toast.success("Note added to review");
   };
 
   return (
